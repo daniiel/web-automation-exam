@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="book-flight-module">
+    <test name="booking flight">
+        <parameter name="browser" value="CHROME"/>
+        <parameter name="flightType" value="Roundtrip"/>
+        <parameter name="flyingFrom" value="LAS"/>
+        <parameter name="flyingTo" value="LAX"/>
+        <parameter name="numberOfAdults" value="1"/>
+        <classes>
+            <class name="com.automation.exam.tests.BookingFlightDriver"/>
+        </classes>
+    </test>
+</suite>
