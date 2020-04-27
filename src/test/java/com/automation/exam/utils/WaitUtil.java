@@ -17,4 +17,12 @@ public class WaitUtil {
     public static void waitForPresenceOfElementLocated(WebDriverWait wait, By by) {
         wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
+
+    public static void waitForVisibilityOf(WebDriverWait wait, WebElement element) {
+        wait.until(ExpectedConditions.visibilityOf(element));
+    }
+
+    public static void waitForNumberOfElementsToBeMoreThan(WebDriverWait wait, By locator, int value) {
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(locator, value));
+    }
 }

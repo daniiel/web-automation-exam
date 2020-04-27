@@ -7,7 +7,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 
-public class BaseDriver {
+public class BaseTest {
 
     private WebDriver driver;
 
@@ -20,7 +20,7 @@ public class BaseDriver {
 
     @AfterTest(alwaysRun = true)
     public void closeBrowser() {
-        driver.quit();
+//        driver.quit();
     }
 
     public WebDriver getDriver() {

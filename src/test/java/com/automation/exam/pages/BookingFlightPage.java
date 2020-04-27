@@ -8,7 +8,7 @@ import org.openqa.selenium.support.FindBy;
 
 import java.time.LocalDate;
 
-import static com.automation.exam.utils.Util.selectByValueFromDropdown;
+import static com.automation.exam.utils.Util.selectDropdownOptionByValue;
 import static com.automation.exam.utils.Util.selectDateFromDatePicker;
 import static com.automation.exam.utils.WaitUtil.waitForElementToBeClickable;
 
@@ -47,7 +47,6 @@ public class BookingFlightPage extends BasePage {
 
     public void selectFlightType(String flightType) {
         waitForElementToBeClickable(getWait(), flightType_roundTrip);
-//        getWait().until(ExpectedConditions.elementToBeClickable(flightType_roundTrip));
         FlightType type = FlightType.valueOfFlightType(flightType);
 
         switch (type) {
@@ -69,7 +68,7 @@ public class BookingFlightPage extends BasePage {
         this.flyingToInput.sendKeys(flyingTo);
         selectDateFromDatePicker(getWait(), departingDateWrapper, departingDate);
         selectDateFromDatePicker(getWait(), returningDateWrapper, returningDate);
-        selectByValueFromDropdown(getWait(), adultsDropdown, numberOfAdults);
+        selectDropdownOptionByValue(getWait(), adultsDropdown, numberOfAdults);
     }
 
     public FlightsListingPage clickSearchButton() {

@@ -2,12 +2,15 @@
 <suite name="book-flight-module">
     <test name="booking flight">
         <parameter name="browser" value="CHROME"/>
+
         <parameter name="flightType" value="Roundtrip"/>
         <parameter name="flyingFrom" value="LAS"/>
         <parameter name="flyingTo" value="LAX"/>
         <parameter name="numberOfAdults" value="1"/>
+
+        <parameter name="sortByDuration" value="duration:desc"/>
         <classes>
-            <class name="com.automation.exam.tests.BookingFlightDriver"/>
+            <class name="com.automation.exam.tests.BookingFlight"/>
         </classes>
     </test>
 </suite>

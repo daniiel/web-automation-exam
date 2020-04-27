@@ -17,7 +17,7 @@ public class Util {
         return toScape.replace(":", "\\:");
     }
 
-    public static void selectByValueFromDropdown(WebDriverWait wait, WebElement dropdown, String toSelect) {
+    public static void selectDropdownOptionByValue(WebDriverWait wait, WebElement dropdown, String toSelect) {
         WaitUtil.waitForElementToBeClickable(wait, dropdown);
         Select elem = new Select(dropdown);
         elem.selectByValue(toSelect);

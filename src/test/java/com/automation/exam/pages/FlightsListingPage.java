@@ -1,52 +1,59 @@
 package com.automation.exam.pages;
 
-import com.automation.exam.utils.Util;
 import com.automation.exam.pages.base.BasePage;
+import com.google.common.collect.Ordering;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.automation.exam.utils.Util.*;
+import static com.automation.exam.utils.WaitUtil.*;
 
 public class FlightsListingPage extends BasePage {
-
-    private By titleBar = By.id("titleBar");
 
     @FindBy(id = "sortDropdown")
     private WebElement sortByDropdown;
 
     @FindBy(css = "#flightModuleList li[data-test-id='offer-listing']")
-    private List<WebElement> flightList;
+    private List<WebElement> flightOfferList;
 
-    private By bySelectBtn = By.cssSelector("div[data-test-id='listing-summary'] button[data-test-id='select-button']");
+    @FindBy(css = "span.duration-emphasis")
+    List<WebElement> flightDurationList;
 
-    private By bySelectThisFareBtn = By.cssSelector(".basic-economy-footer button[data-test-id='select-button']");
+    private By idTitlePage = By.id("titleBar");
+    private By cssSelectButton = By.cssSelector("[data-test-id='listing-summary'] button[data-test-id='select-button']");
+    private By cssSelectFareButton = By.cssSelector(".basic-economy-footer button[data-test-id='select-button']");
+    private By cssFlightDuration = By.cssSelector("span.duration-emphasis");
 
-    private By byFlightDuration = By.cssSelector("span.duration-emphasis");
+    // Offer elements
+    private static final String cssFlightOfferList = "#flightModuleList li[data-test-id='offer-listing']";
+    private static final String cssDetailsAndBaggageFees = "a[data-test-id='flight-details-link']";
+    private static final String cssFlightDetailsContainer = ".details-container + .flight-details";
+    private static final String idFlightDetail = "flight-details-tabs-offer";
+    private static final String cssBaggageFeeDetails = ".details-baggage-fee-info";
 
     // Flight duration time has format '6h 0m'
     private DateTimeFormatter flightDurationFormatter = DateTimeFormatter.ofPattern("H'h' m'm'");
 
+    Logger logger = LoggerFactory.getLogger(FlightsListingPage.class);
+
     public FlightsListingPage(WebDriver driver) {
         super(driver);
-//        waitForFlightListingModule();
-    }
-
-    public void waitForFlightListingModule() {
-        getWait().until(ExpectedConditions.presenceOfElementLocated(By.id("skeleton-listing")));
-        getWait().until(ExpectedConditions.stalenessOf(getDriver().findElement(By.id("skeleton-listing"))));
-        System.out.println("skeleton-listing disappeared");
     }
 
     public boolean isLoaded() {
         try {
-            getWait().until(ExpectedConditions.presenceOfElementLocated(titleBar));
+            waitForPresenceOfElementLocated(getWait(), idTitlePage);
             return true;
         } catch (TimeoutException e) {
             return false;
@@ -59,38 +66,38 @@ public class FlightsListingPage extends BasePage {
     }
 
     public boolean isPresentSelectBtnForAllOffers() {
-        return isPresentElementForAllOffers(bySelectBtn);
+        waitForNumberOfElementsToBeMoreThan(getWait(), By.cssSelector(cssFlightOfferList), 0);
+        return isPresentElementForAllOffers(cssSelectButton);
     }
 
     public boolean isPresentFlightDurationForAllOffers() {
-        return isPresentElementForAllOffers(byFlightDuration);
+        return isPresentElementForAllOffers(cssFlightDuration);
+    }
+
+    public void clickDetailsAndBaggageFeesToggle(WebElement offer) {
+        WebElement toggle = offer.findElement(By.cssSelector(cssDetailsAndBaggageFees));
+        toggle.click();
+        getWait().until(ExpectedConditions.attributeContains(toggle, "class", "open"));
+    }
+
+    public boolean isFlightDetailsPresent(WebElement offer) {
+        return !offer.findElements(By.id(idFlightDetail)).isEmpty();
+    }
+
+    public boolean isBaggageFeeDetailsPresent(WebElement offer) {
+        return !offer.findElements(By.cssSelector(cssBaggageFeeDetails)).isEmpty();
     }
 
     public boolean isPresentFlightDetailsAndBaggageFeesForAllOffers() {
-        List<WebElement> baggageFeeDetails;
-        List<WebElement> flightDetails;
-        WebElement detailsAndBaggageFeesToggle;
 
-        for (WebElement offer: flightList) {
-            detailsAndBaggageFeesToggle = offer.findElement(By.cssSelector("a[data-test-id='flight-details-link']"));
-            detailsAndBaggageFeesToggle.click();
-            System.out.println("** : " + offer.getAttribute("id"));
-//            try {
-//                Thread.sleep(600);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-            String selector = "#" + Util.scapeColon(offer.getAttribute("id")) + " .flight-details";
+        for (WebElement offer: flightOfferList) {
+            clickDetailsAndBaggageFeesToggle(offer);
 
-//            getWait().until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(selector)));
-            getWait().until(ExpectedConditions.visibilityOf(getDriver().findElement(By.cssSelector(selector))));
+            logger.info("offerId: " + offer.getAttribute("id"));
+//            waitForVisibilityOf(getWait(), offer.findElement(By.cssSelector(cssFlightDetailsContainer)));
 
-            flightDetails = offer.findElements(By.id("flight-details-tabs-offer"));
-            baggageFeeDetails = offer.findElements(By.className("details-baggage-fee-info"));
-
-            if (flightDetails.isEmpty() ||  baggageFeeDetails.isEmpty()) {
-                System.out.println("[Offer] " + offer.findElement(By.cssSelector("span[data-test-id='airline-name'")).getText()
-                        + " - " + offer.findElement(byFlightDuration).getText() + " doesn't have flight or baggage fee details");
+            if (!isFlightDetailsPresent(offer) || !isBaggageFeeDetailsPresent(offer)) {
+                logger.info("offerId: " + offer.getAttribute("id") + " doesn't have flight or baggage fee details");
                 return false;
             }
         }
@@ -98,97 +105,70 @@ public class FlightsListingPage extends BasePage {
     }
 
     public boolean isPresentElementForAllOffers(By by) {
-        List<WebElement> item;
-        for (WebElement offer: flightList) {
-            item = offer.findElements(by);
-            if (item.isEmpty()) {
+        for (WebElement offer: flightOfferList) {
+            if (offer.findElements(by).isEmpty()) {
                 return false;
             }
         }
         return true;
     }
 
-    public void sortByValue(String value) {
-        Select sortBy = new Select(sortByDropdown);
-        sortBy.selectByValue("duration:asc");
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void sortOffersByValue(String value) {
+        selectDropdownOptionByValue(getWait(), sortByDropdown, value);
     }
 
-    private List<WebElement> getFlightList() {
+    private List<WebElement> getFlightOfferList() {
         return getDriver().findElements(By.cssSelector("ul#flightModuleList li[data-test-id='offer-listing']"));
     }
 
-    public boolean isFlightDurationTimeOrderByShortest() {
-        LocalTime previousOfferTime = getFirstFlightDuration();
-        LocalTime currentOfferTime;
-        String durationFlight;
+    public boolean isFlightDurationTimeOrderByShortest(String sortBy) {
+        waitForElementToBeClickable(getWait(), sortByDropdown);
+        List <LocalTime> flightDurationsList = flightDurationList.stream()
+                .map(element -> LocalTime.parse(element.getText(), flightDurationFormatter))
+                .collect(Collectors.toList());
+        flightDurationsList.forEach(System.out::println);
 
-        for (WebElement offer: flightList) {
-            durationFlight = offer.findElement(By.className("duration-emphasis")).getText();
-            currentOfferTime = LocalTime.parse(durationFlight, flightDurationFormatter);
-
-            if (!isCurrentOfferTimeGreaterOrEqualThanPreviousOfferTime(currentOfferTime, previousOfferTime)) {
-                System.out.println("[ERROR] Ordering fails: previousOfferTime: "+previousOfferTime + " currentOfferTime: " + currentOfferTime);
-                return false;
-            }
-            previousOfferTime = currentOfferTime;
-        }
-        return true;
-    }
-
-    private LocalTime getFirstFlightDuration() {
-        String firstOfferTime = flightList.get(0).findElement(By.className("duration-emphasis")).getText();
-        return LocalTime.parse(firstOfferTime, flightDurationFormatter);
-    }
-
-    private boolean isCurrentOfferTimeGreaterOrEqualThanPreviousOfferTime(LocalTime current, LocalTime previous) {
-        return current.compareTo(previous) >= 0 ? true : false;
-    }
-
-    public void pickDepartureLasOffer() {
-        if (!flightList.isEmpty()) {
-            // Departure to Los Angeles
-            WebElement offerToSelect = flightList.get(0);
-            confirmOffer(offerToSelect);
-            By by = By.cssSelector("#flightModuleList li[data-test-id='offer-listing']");
-            getWait().until(ExpectedConditions.numberOfElementsToBeMoreThan(by,0));
+        String orderType = sortBy.split(":")[1];
+        switch (orderType) {
+            case "desc":
+                return Ordering.natural().reverse().isOrdered(flightDurationsList);
+            default:
+                // "asc"
+                return Ordering.natural().isOrdered(flightDurationsList);
         }
     }
 
-    public TripSummaryPage pickDepartureLaxOffer() {
+    public void pickDepartureLASOffer() {
+        if (!flightOfferList.isEmpty()) {
+            // Select First result (Departure to Los Angeles)
+            confirmOffer(flightOfferList.get(0));
+        }
+    }
+
+    public TripDetailPage pickDepartureLAXOffer() {
         // Departure to Las Vegas
-        List<WebElement> returnOfferListing = getFlightList();
+        List<WebElement> returnOfferListing = getFlightOfferList();
 
         if (returnOfferListing.isEmpty()) {
-            System.out.println( "Departure flight list empty");
+            logger.error("Las vegas flight list empty");
             return null;
         }
 
-        WebElement offerToSelect;
-
+        // Select Third result (Departure to Las Vegas)
         if (returnOfferListing.size() > 2 ) {
-            offerToSelect = returnOfferListing.get(2);
+            confirmOffer(returnOfferListing.get(2));
         } else {
-            offerToSelect = returnOfferListing.get(returnOfferListing.size() -1);
+            confirmOffer(returnOfferListing.get(returnOfferListing.size() -1));
         }
 
-        confirmOffer(offerToSelect);
-        return new TripSummaryPage(getDriver());
+        return new TripDetailPage(getDriver());
     }
 
     private void confirmOffer(WebElement offer) {
-        List<WebElement> fareBtn = offer.findElements(bySelectThisFareBtn);
-        offer.findElement(bySelectBtn).click();
-        acceptRulesAndRestrictionsIfExist(fareBtn);
-    }
-
-    private void acceptRulesAndRestrictionsIfExist(List<WebElement> fareBtn) {
-        if (!fareBtn.isEmpty()) {
-            fareBtn.get(0).click();
+        boolean hasOfferDoubleConfirmation = !offer.findElements(cssSelectFareButton).isEmpty();
+        offer.findElement(cssSelectButton).click();
+        if (hasOfferDoubleConfirmation) {
+            offer.findElement(cssSelectFareButton).click();
         }
     }
 
