@@ -7,9 +7,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class WaitUtil {
 
-    private WaitUtil() {
-    }
-
     public static void waitForElementToBeClickable(WebDriverWait wait, WebElement element) {
         wait.until(ExpectedConditions.elementToBeClickable(element));
     }

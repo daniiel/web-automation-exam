@@ -1,6 +1,8 @@
 package com.automation.exam.utils;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Quotes;
@@ -13,8 +15,14 @@ public class Util {
 
     private Util() {}
 
-    public static String scapeColon(String toScape) {
-        return toScape.replace(":", "\\:");
+    public static boolean isElementPresent(WebDriver driver, By by) {
+        try{
+            driver.findElement(by);
+            return true;
+        }
+        catch(NoSuchElementException e){
+            return false;
+        }
     }
 
     public static void selectDropdownOptionByValue(WebDriverWait wait, WebElement dropdown, String toSelect) {
@@ -58,7 +66,5 @@ public class Util {
                 By.xpath(".//button[@data-day=" + Quotes.escape(String.valueOf(dateDesired.getDayOfMonth())) +"]"));
         dayBtn.click();
     }
-
-
 
 }

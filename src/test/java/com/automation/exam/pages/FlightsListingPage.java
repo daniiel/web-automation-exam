@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,9 @@ public class FlightsListingPage extends BasePage {
 
     @FindBy(id = "sortDropdown")
     private WebElement sortByDropdown;
+
+    @FindBy(css = "sortDropdown option")
+    private List<WebElement> sortByOptions;
 
     @FindBy(css = "#flightModuleList li[data-test-id='offer-listing']")
     private List<WebElement> flightOfferList;
@@ -36,11 +40,16 @@ public class FlightsListingPage extends BasePage {
     private By cssFlightDuration = By.cssSelector("span.duration-emphasis");
 
     // Offer elements
+    private static final String idSortDropdown = "sortDropdown";
     private static final String cssFlightOfferList = "#flightModuleList li[data-test-id='offer-listing']";
     private static final String cssDetailsAndBaggageFees = "a[data-test-id='flight-details-link']";
     private static final String cssFlightDetailsContainer = ".details-container + .flight-details";
     private static final String idFlightDetail = "flight-details-tabs-offer";
     private static final String cssBaggageFeeDetails = ".details-baggage-fee-info";
+
+    private static final List<String> sortByOptionsText =
+            Arrays.asList("Price (Lowest)", "Price (Highest)", "Duration (Shortest)", "Duration (Longest)",
+                    "Departure (Earliest)", "Departure (Latest)", "Arrival (Earliest)", "Arrival (Latest)");
 
     // Flight duration time has format '6h 0m'
     private DateTimeFormatter flightDurationFormatter = DateTimeFormatter.ofPattern("H'h' m'm'");
@@ -61,7 +70,7 @@ public class FlightsListingPage extends BasePage {
     }
 
     public boolean isPresentOrderByOption() {
-        List<WebElement> sortBySelect = getDriver().findElements(By.id("sortDropdown"));
+        List<WebElement> sortBySelect = getDriver().findElements(By.id(idSortDropdown));
         return !sortBySelect.isEmpty();
     }
 
@@ -89,12 +98,9 @@ public class FlightsListingPage extends BasePage {
     }
 
     public boolean isPresentFlightDetailsAndBaggageFeesForAllOffers() {
-
         for (WebElement offer: flightOfferList) {
             clickDetailsAndBaggageFeesToggle(offer);
-
             logger.info("offerId: " + offer.getAttribute("id"));
-//            waitForVisibilityOf(getWait(), offer.findElement(By.cssSelector(cssFlightDetailsContainer)));
 
             if (!isFlightDetailsPresent(offer) || !isBaggageFeeDetailsPresent(offer)) {
                 logger.info("offerId: " + offer.getAttribute("id") + " doesn't have flight or baggage fee details");
@@ -117,23 +123,17 @@ public class FlightsListingPage extends BasePage {
         selectDropdownOptionByValue(getWait(), sortByDropdown, value);
     }
 
-    private List<WebElement> getFlightOfferList() {
-        return getDriver().findElements(By.cssSelector("ul#flightModuleList li[data-test-id='offer-listing']"));
-    }
-
     public boolean isFlightDurationTimeOrderByShortest(String sortBy) {
         waitForElementToBeClickable(getWait(), sortByDropdown);
         List <LocalTime> flightDurationsList = flightDurationList.stream()
                 .map(element -> LocalTime.parse(element.getText(), flightDurationFormatter))
                 .collect(Collectors.toList());
-        flightDurationsList.forEach(System.out::println);
 
         String orderType = sortBy.split(":")[1];
         switch (orderType) {
             case "desc":
                 return Ordering.natural().reverse().isOrdered(flightDurationsList);
-            default:
-                // "asc"
+            default: // "asc"
                 return Ordering.natural().isOrdered(flightDurationsList);
         }
     }
@@ -141,25 +141,21 @@ public class FlightsListingPage extends BasePage {
     public void pickDepartureLASOffer() {
         if (!flightOfferList.isEmpty()) {
             // Select First result (Departure to Los Angeles)
+            logger.info("Offer (LAS): " + flightOfferList.get(0).getAttribute("id"));
             confirmOffer(flightOfferList.get(0));
         }
     }
 
     public TripDetailPage pickDepartureLAXOffer() {
         // Departure to Las Vegas
-        List<WebElement> returnOfferListing = getFlightOfferList();
+        waitForNumberOfElementsToBeMoreThan(getWait(), By.cssSelector(cssFlightOfferList), 0);
 
-        if (returnOfferListing.isEmpty()) {
-            logger.error("Las vegas flight list empty");
-            return null;
-        }
+        int numberOffers = flightOfferList.size();
 
         // Select Third result (Departure to Las Vegas)
-        if (returnOfferListing.size() > 2 ) {
-            confirmOffer(returnOfferListing.get(2));
-        } else {
-            confirmOffer(returnOfferListing.get(returnOfferListing.size() -1));
-        }
+        int indexOffer = numberOffers > 2 ? 2 : numberOffers -1;
+        logger.info("Offer (LAX): " + flightOfferList.get(indexOffer).getAttribute("id"));
+        confirmOffer(flightOfferList.get(indexOffer));
 
         return new TripDetailPage(getDriver());
     }

@@ -5,6 +5,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -12,14 +14,18 @@ import java.util.Set;
 
 public class TripDetailPage extends BasePage {
 
-    @FindBy(css = "div.flightSummary div.OD1")
-    private WebElement returnInformation;
+    @FindBy(id = "bookButton")
+    private WebElement bookingButton;
 
     private static final String pageTitle = "Trip Detail";
     private static final String cssPriceTotal = "#tripSummaryToggleContent-desktopView ~ .totalContainer .packagePriceTotal";
+    private static final String cssPriceGuarantee = "#tripSummaryToggleContent-desktopView ~ .totalContainer .priceGuarantee";
     private static final String cssDepartureInformation = "div.flightSummary div.OD0";
     private static final String cssReturnInformation = "div.flightSummary div.OD1";
 
+    private final String priceGuaranteeText = "Price Guarantee";
+
+    Logger logger = LoggerFactory.getLogger(TripDetailPage.class);
 
     public TripDetailPage(WebDriver driver) {
         super(driver);
@@ -45,6 +51,7 @@ public class TripDetailPage extends BasePage {
     }
 
     public String getPageTitle() {
+        logger.info("title page: " + getDriver().getTitle());
         return getDriver().getTitle();
     }
 
@@ -57,7 +64,26 @@ public class TripDetailPage extends BasePage {
     }
 
     public boolean isPresentDepartureAndReturnInformation() {
+        if (getDriver().findElements(By.cssSelector(cssDepartureInformation)).isEmpty()
+                || getDriver().findElements(By.cssSelector(cssReturnInformation)).isEmpty()) {
+            return false;
+        }
         return true;
+    }
+
+    public boolean isPresentPriceGuaranteeText() {
+        if (getDriver().findElements(By.cssSelector(cssPriceGuarantee)).isEmpty()) {
+            return false;
+        }
+        String priceText = getDriver().findElement(By.cssSelector(cssPriceGuarantee)).getText();
+        logger.info("price Text: " + priceText);
+
+        return priceText.equals(priceGuaranteeText);
+    }
+
+    public PaymentPage clickBookingButton() {
+        bookingButton.click();
+        return new PaymentPage(getDriver());
     }
 
 }

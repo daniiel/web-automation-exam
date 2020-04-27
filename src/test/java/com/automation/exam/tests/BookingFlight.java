@@ -3,6 +3,7 @@ package com.automation.exam.tests;
 import com.automation.exam.pages.BookingFlightPage;
 import com.automation.exam.pages.FlightsListingPage;
 import com.automation.exam.pages.HomePage;
+import com.automation.exam.pages.PaymentPage;
 import com.automation.exam.pages.TripDetailPage;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
@@ -17,6 +18,7 @@ public class BookingFlight extends BaseTest {
 
     private FlightsListingPage flightModuleList;
     private TripDetailPage tripSummary;
+    private PaymentPage payment;
 
     @BeforeTest()
     public void selectFlightTab() {
@@ -60,10 +62,21 @@ public class BookingFlight extends BaseTest {
         assertTrue(tripSummary.getPageTitle().contains("Trip Detail"), "Trip Detail tab selected correctly");
     }
 
-
     @Test(dependsOnMethods = "pickOffers")
-    public void validateTripDetails() {
-        tripSummary.isPresentTripTotalPrice();
+    public void validateTripDetailsComponents() {
+        assertTrue(tripSummary.isPresentTripTotalPrice(), "Trip total price is not present");
+        assertTrue(tripSummary.isPresentDepartureAndReturnInformation(), "Departure and return information is not present");
+        assertTrue(tripSummary.isPresentPriceGuaranteeText(), "Price guarantee text is present");
+    }
+
+    @Test(dependsOnMethods = "validateTripDetailsComponents")
+    public void paymentValidation() {
+        payment = tripSummary.clickBookingButton();
+        assertTrue(payment.isLoaded(),"The Payment page is not loaded");
+        assertTrue(payment.isPresentFirstNameInput());
+        assertTrue(payment.isPresentCountryDropdown());
+        assertTrue(payment.isPresentTotalPriceForTrip());
+        assertEquals(payment.getLocationInformation(), "Las Vegas (LAS) to Los Angeles (LAX)");
     }
 
 }

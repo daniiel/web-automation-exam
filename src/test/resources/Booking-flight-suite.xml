@@ -8,7 +8,7 @@
         <parameter name="flyingTo" value="LAX"/>
         <parameter name="numberOfAdults" value="1"/>
 
-        <parameter name="sortByDuration" value="duration:desc"/>
+        <parameter name="sortByDuration" value="duration:asc"/>
         <classes>
             <class name="com.automation.exam.tests.BookingFlight"/>
         </classes>
