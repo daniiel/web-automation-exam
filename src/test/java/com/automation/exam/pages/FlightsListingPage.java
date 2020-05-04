@@ -43,7 +43,7 @@ public class FlightsListingPage extends BasePage {
     private By byFlightDuration = By.cssSelector(cssFlightDuration);
 
 
-    private static final List<String> sortByOptionsText =
+    private static final List<String> SORT_BY_OPTIONS_TEXT =
             Arrays.asList("Price (Lowest)", "Price (Highest)", "Duration (Shortest)", "Duration (Longest)",
                     "Departure (Earliest)", "Departure (Latest)", "Arrival (Earliest)", "Arrival (Latest)");
 
@@ -69,8 +69,8 @@ public class FlightsListingPage extends BasePage {
         return !getDriver().findElements(By.id(idSortDropdown)).isEmpty();
     }
 
-    public boolean sortByDropdownHasAllOptions() {
-        return dropdownHasAllOptions(sortByDropdown, sortByOptionsText);
+    public boolean sortDropdownHasAllOptions() {
+        return dropdownHasAllOptions(sortByDropdown, SORT_BY_OPTIONS_TEXT);
     }
 
     public boolean isPresentSelectBtnForAllOffers() {
