@@ -42,9 +42,9 @@ Inside the ```resource```  folder you can find the Booking-flight-suite.xml.
 
 #### Owner
 
-Daniel Buitrago Caceres
-Java Develper
-TAE Academy
+Daniel Buitrago Caceres.
+Java Developer.
+TAE Academy.
 
 
 
