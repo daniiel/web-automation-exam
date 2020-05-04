@@ -7,17 +7,13 @@ import org.openqa.selenium.support.FindBy;
 
 public class HomePage extends BasePage {
 
-    private static final String idFlightTab = "tab-flight-tab-hp";
-    private static final String idHotelTab = "tab-hotel-tab-hp";
-    private static final String idVacationPackagesTab = "tab-package-tab-hp";
-
     private static final String URL = "https://www.travelocity.com/";
 
-    @FindBy(id = idFlightTab)
+    @FindBy(id = "tab-flight-tab-hp")
     private WebElement flightTab;
-    @FindBy(id = idHotelTab)
+    @FindBy(id = "tab-hotel-tab-hp")
     private WebElement hotelTab;
-    @FindBy(id = idVacationPackagesTab)
+    @FindBy(id = "tab-package-tab-hp")
     private WebElement vacationPackagesTab;
 
     public HomePage(WebDriver driver) {

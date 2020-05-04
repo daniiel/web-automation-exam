@@ -14,16 +14,9 @@ import java.util.Set;
 
 public class TripDetailPage extends BasePage {
 
-    private static final String pageTitle = "Trip Detail";
-    private static final String idBookingButton = "bookButton";
-    private static final String cssPriceTotal = "#tripSummaryToggleContent-desktopView ~ .totalContainer .packagePriceTotal";
     private static final String cssPriceGuarantee = "#tripSummaryToggleContent-desktopView ~ .totalContainer .priceGuarantee";
-    private static final String cssDepartureInformation = "div.flightSummary div.OD0";
-    private static final String cssReturnInformation = "div.flightSummary div.OD1";
 
-    private final String priceGuaranteeText = "Price Guarantee";
-
-    @FindBy(id = idBookingButton)
+    @FindBy(id = "bookButton")
     private WebElement bookingButton;
 
     Logger logger = LoggerFactory.getLogger(TripDetailPage.class);
@@ -38,7 +31,7 @@ public class TripDetailPage extends BasePage {
     }
 
     public boolean isPresentTripTotalPrice() {
-        List<WebElement> totalPrice = getDriver().findElements(By.cssSelector(cssPriceTotal));
+        List<WebElement> totalPrice = getDriver().findElements(By.cssSelector("#tripSummaryToggleContent-desktopView ~ .totalContainer .packagePriceTotal"));
         if (totalPrice.isEmpty()) {
             return false;
         }
@@ -46,8 +39,8 @@ public class TripDetailPage extends BasePage {
     }
 
     public boolean isPresentDepartureAndReturnInformation() {
-        if (getDriver().findElements(By.cssSelector(cssDepartureInformation)).isEmpty()
-                || getDriver().findElements(By.cssSelector(cssReturnInformation)).isEmpty()) {
+        if (getDriver().findElements(By.cssSelector("div.flightSummary div.OD0")).isEmpty()
+                || getDriver().findElements(By.cssSelector("div.flightSummary div.OD1")).isEmpty()) {
             return false;
         }
         return true;
@@ -64,7 +57,7 @@ public class TripDetailPage extends BasePage {
         }
         String priceText = getDriver().findElement(By.cssSelector(cssPriceGuarantee)).getText();
 
-        return priceText.equals(priceGuaranteeText);
+        return priceText.equals("Price Guarantee");
     }
 
     public PaymentPage clickBookingButton() {
@@ -83,7 +76,7 @@ public class TripDetailPage extends BasePage {
 
             if (!currentWindow.equalsIgnoreCase(childWindow)) {
                 getDriver().switchTo().window(childWindow);
-                if (getPageTitle().contains(pageTitle)) {
+                if (getPageTitle().contains("Trip Detail")) {
                     return;
                 }
             }

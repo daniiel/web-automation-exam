@@ -11,20 +11,13 @@ import static com.automation.exam.utils.WaitUtil.waitForPresenceOfElementLocated
 
 public class PaymentPage extends BasePage {
 
-    private static final String cssLocationInformation = ".location-info";
-    private static final String cssWhoIsTravelingTitle = "h2.faceoff-module-title";
-    private static final String idFirstNameInput = "firstname[0]";
-    private static final String idCountryDropdown = "country_code[0]";
-    private static final String idTotalPrice = "totalPriceForTrip";
-
-    @FindBy(css = cssLocationInformation)
+    @FindBy(css = ".location-info")
     private WebElement locationInformation;
 
-    private By byWhoIsTravelingTitle = By.cssSelector(cssWhoIsTravelingTitle);
-    private By byFirstNameInput = By.id(idFirstNameInput);
-    private By byCountryDropdown = By.id(idCountryDropdown);
-    private By byTotalPrice = By.id(idTotalPrice);
-
+    private By byWhoIsTravelingTitle = By.cssSelector("h2.faceoff-module-title");
+    private By byFirstNameInput = By.id("firstname[0]");
+    private By byCountryDropdown = By.id("country_code[0]");
+    private By byTotalPrice = By.id("totalPriceForTrip");
 
     public PaymentPage(WebDriver driver) {
         super(driver);

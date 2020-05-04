@@ -15,34 +15,23 @@ import static com.automation.exam.utils.WaitUtil.waitForPresenceOfElementLocated
 
 public class FlightFormPage extends BasePage {
 
-    private static final String cssAutocomplete = "#typeaheadDataPlain";
-    private static final String idRoundTripFlightType = "flight-type-roundtrip-label-hp-flight";
-    private static final String idOneWayFlightType = "flight-type-one-way-label-hp-flight";
-    private static final String idMultiCityFlightType = "flight-type-multi-dest-label-hp-flight";
-    private static final String idFlyingFromInput = "flight-origin-hp-flight";
-    private static final String idFlyingToInput = "flight-destination-hp-flight";
-    private static final String idDepartingDateWrapper = "flight-departing-wrapper-hp-flight";
-    private static final String idReturningDateWrapper = "flight-returning-wrapper-hp-flight";
-    private static final String idAdultsDropdown = "flight-adults-hp-flight";
-    private static final String cssSearchButton = "#gcw-flights-form-hp-flight button[type='submit']";
-
-    @FindBy(id = idRoundTripFlightType)
+    @FindBy(id = "flight-type-roundtrip-label-hp-flight")
     private WebElement roundTripFlightType;
-    @FindBy(id = idOneWayFlightType)
+    @FindBy(id = "flight-type-one-way-label-hp-flight")
     private WebElement oneWayFlightType;
-    @FindBy(id = idMultiCityFlightType)
+    @FindBy(id = "flight-type-multi-dest-label-hp-flight")
     private WebElement multiCityFlightType;
-    @FindBy(id = idFlyingFromInput)
+    @FindBy(id = "flight-origin-hp-flight")
     private WebElement flyingFromInput;
-    @FindBy(id = idFlyingToInput)
+    @FindBy(id = "flight-destination-hp-flight")
     private WebElement flyingToInput;
-    @FindBy(id = idDepartingDateWrapper)
+    @FindBy(id = "flight-departing-wrapper-hp-flight")
     private WebElement departingDateWrapper;
-    @FindBy(id = idReturningDateWrapper)
+    @FindBy(id = "flight-returning-wrapper-hp-flight")
     private WebElement returningDateWrapper;
-    @FindBy(id = idAdultsDropdown)
+    @FindBy(id = "flight-adults-hp-flight")
     private WebElement adultsDropdown;
-    @FindBy(css = cssSearchButton)
+    @FindBy(css = "#gcw-flights-form-hp-flight button[type='submit']")
     private WebElement searchButton;
 
     public FlightFormPage(WebDriver driver) {
@@ -80,9 +69,9 @@ public class FlightFormPage extends BasePage {
         return new FlightsListingPage(getDriver());
     }
 
-    public void sendKeysUsingSuggestionsToolTip(WebElement element, String value) {
+    private void sendKeysUsingSuggestionsToolTip(WebElement element, String value) {
         sendKeys(element, value);
-        waitForPresenceOfElementLocated(getWait(), By.cssSelector(cssAutocomplete));
+        waitForPresenceOfElementLocated(getWait(), By.cssSelector("#typeaheadDataPlain"));
         element.sendKeys(Keys.TAB);
     }
 

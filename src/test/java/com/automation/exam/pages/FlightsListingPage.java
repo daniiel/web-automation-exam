@@ -22,21 +22,13 @@ import static com.automation.exam.utils.WaitUtil.*;
 public class FlightsListingPage extends BasePage {
 
     private static final String idSortDropdown = "sortDropdown";
-    private static final String idFlightDetail = "flight-details-tabs-offer";
-    private static final String idTitlePage = "titleBar";
-    private static final String cssSortByOptions = "sortDropdown option";
     private static final String cssFlightOfferList = "#flightModuleList li[data-test-id='offer-listing']";
-    private static final String cssSelectButton = "[data-test-id='listing-summary'] button[data-test-id='select-button']";
-    private static final String cssSelectFareButton = ".basic-economy-footer button[data-test-id='select-button']";
     private static final String cssFlightDuration = "span.duration-emphasis";
-    private static final String cssDetailsAndBaggageFees = "a[data-test-id='flight-details-link']";
-
-    private static final String cssBaggageFeeDetails = ".details-baggage-fee-info";
 
     @FindBy(id = idSortDropdown)
     private WebElement sortByDropdown;
 
-    @FindBy(css = cssSortByOptions)
+    @FindBy(css = "sortDropdown option")
     private List<WebElement> sortByOptions;
 
     @FindBy(css = cssFlightOfferList)
@@ -45,9 +37,9 @@ public class FlightsListingPage extends BasePage {
     @FindBy(css = cssFlightDuration)
     List<WebElement> flightDurationList;
 
-    private By byTitlePage = By.id(idTitlePage);
-    private By bySelectButton = By.cssSelector(cssSelectButton);
-    private By bySelectFareButton = By.cssSelector(cssSelectFareButton);
+    private By byTitlePage = By.id("titleBar");
+    private By bySelectButton = By.cssSelector("[data-test-id='listing-summary'] button[data-test-id='select-button']");
+    private By bySelectFareButton = By.cssSelector(".basic-economy-footer button[data-test-id='select-button']");
     private By byFlightDuration = By.cssSelector(cssFlightDuration);
 
 
@@ -103,18 +95,18 @@ public class FlightsListingPage extends BasePage {
         return true;
     }
 
-    public void clickDetailsAndBaggageFeesToggle(WebElement offer) {
-        WebElement toggle = offer.findElement(By.cssSelector(cssDetailsAndBaggageFees));
+    private void clickDetailsAndBaggageFeesToggle(WebElement offer) {
+        WebElement toggle = offer.findElement(By.cssSelector("a[data-test-id='flight-details-link']"));
         toggle.click();
         waitForAttributeContains(getWait(), toggle, "class", "open");
     }
 
-    public boolean isFlightDetailsPresent(WebElement offer) {
-        return !offer.findElements(By.id(idFlightDetail)).isEmpty();
+    private boolean isFlightDetailsPresent(WebElement offer) {
+        return !offer.findElements(By.id("flight-details-tabs-offer")).isEmpty();
     }
 
-    public boolean isBaggageFeeDetailsPresent(WebElement offer) {
-        return !offer.findElements(By.cssSelector(cssBaggageFeeDetails)).isEmpty();
+    private boolean isBaggageFeeDetailsPresent(WebElement offer) {
+        return !offer.findElements(By.cssSelector(".details-baggage-fee-info")).isEmpty();
     }
 
     public boolean isPresentElementForAllOffers(By by) {
