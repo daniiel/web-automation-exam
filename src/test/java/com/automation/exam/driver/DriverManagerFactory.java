@@ -1,8 +1,8 @@
 package com.automation.exam.driver;
 
-import com.automation.exam.driver.driversmanager.FirefoxDriverManager;
-import com.automation.exam.driver.driversmanager.ChromeDriverManager;
 import com.automation.exam.constanst.DriverType;
+import com.automation.exam.driver.driversmanager.ChromeDriverManager;
+import com.automation.exam.driver.driversmanager.FirefoxDriverManager;
 
 public class DriverManagerFactory {
 

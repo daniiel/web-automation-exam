@@ -1,6 +1,6 @@
 package com.automation.exam.tests;
 
-import com.automation.exam.pages.BookingFlightPage;
+import com.automation.exam.pages.FlightFormPage;
 import com.automation.exam.pages.FlightsListingPage;
 import com.automation.exam.pages.HomePage;
 import com.automation.exam.pages.PaymentPage;
@@ -11,12 +11,11 @@ import org.testng.annotations.Test;
 
 import java.time.LocalDate;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 public class BookingFlight extends BaseTest {
 
-    private FlightsListingPage flightModuleList;
+    private FlightsListingPage flightsListing;
     private TripDetailPage tripSummary;
     private PaymentPage payment;
 
@@ -29,44 +28,45 @@ public class BookingFlight extends BaseTest {
     @Test
     @Parameters({"flightType", "flyingFrom", "flyingTo", "numberOfAdults"})
     public void searchForFlights(String flightType, String flyingFrom, String flyingTo, String numberOfAdults) {
-        BookingFlightPage bookingFlightPage = new BookingFlightPage(getDriver());
+        FlightFormPage flightForm = new FlightFormPage(getDriver());
         LocalDate departingDate = LocalDate.now().plusMonths(2);
         LocalDate returningDate = LocalDate.now().plusMonths(2).plusDays(5);
 
-        bookingFlightPage.selectFlightType(flightType);
-        bookingFlightPage.fillFlightForm(flyingFrom, flyingTo, departingDate, returningDate, numberOfAdults);
-        this.flightModuleList = bookingFlightPage.clickSearchButton();
+        flightForm.selectFlightType(flightType);
+        flightForm.fillFlightForm(flyingFrom, flyingTo, departingDate, returningDate, numberOfAdults);
+        this.flightsListing = flightForm.clickSearchButton();
 
-        assertTrue(flightModuleList.isLoaded(), "The flight module list is loaded");
+        assertTrue(flightsListing.isLoaded(), "The flights listing page is not loaded");
     }
 
     @Test(dependsOnMethods = "searchForFlights")
     public void validateFlightModuleListComponents() {
-        assertTrue(flightModuleList.isPresentOrderByOption());
-        assertTrue(flightModuleList.isPresentSelectBtnForAllOffers());
-        assertTrue(flightModuleList.isPresentFlightDurationForAllOffers());
-//        assertTrue(flightModuleList.isPresentFlightDetailsAndBaggageFeesForAllOffers());
+        assertTrue(flightsListing.isPresentOrderByOption());
+        assertTrue(flightsListing.sortByDropdownHasAllOptions());
+        assertTrue(flightsListing.isPresentSelectBtnForAllOffers());
+        assertTrue(flightsListing.isPresentFlightDurationForAllOffers());
+        assertTrue(flightsListing.isPresentFlightDetailsAndBaggageFeesForAllOffers());
     }
 
     @Test(dependsOnMethods = "validateFlightModuleListComponents")
     @Parameters({"sortByDuration"})
     public void sortListByDuration(String sortByDuration) {
-        flightModuleList.sortOffersByValue(sortByDuration);
-        assertTrue(flightModuleList.isFlightDurationTimeOrderByShortest(sortByDuration));
+        flightsListing.sortOffersByValue(sortByDuration);
+        assertTrue(flightsListing.isFlightDurationTimeOrderByShortest(sortByDuration));
     }
 
     @Test(dependsOnMethods = "sortListByDuration")
     public void pickOffers() {
-        flightModuleList.pickDepartureLASOffer();
-        tripSummary = flightModuleList.pickDepartureLAXOffer();
-        assertTrue(tripSummary.getPageTitle().contains("Trip Detail"), "Trip Detail tab selected correctly");
+        flightsListing.pickFirstDepartureLASOffer();
+        tripSummary = flightsListing.pickThirdDepartureLAXOffer();
+        assertTrue(tripSummary.getPageTitle().contains("Trip Detail"), "Trip detail tab wasn't selected");
     }
 
     @Test(dependsOnMethods = "pickOffers")
     public void validateTripDetailsComponents() {
         assertTrue(tripSummary.isPresentTripTotalPrice(), "Trip total price is not present");
         assertTrue(tripSummary.isPresentDepartureAndReturnInformation(), "Departure and return information is not present");
-        assertTrue(tripSummary.isPresentPriceGuaranteeText(), "Price guarantee text is present");
+        assertTrue(tripSummary.isPresentPriceGuaranteeText(), "Price guarantee text is not present");
     }
 
     @Test(dependsOnMethods = "validateTripDetailsComponents")
@@ -76,7 +76,7 @@ public class BookingFlight extends BaseTest {
         assertTrue(payment.isPresentFirstNameInput());
         assertTrue(payment.isPresentCountryDropdown());
         assertTrue(payment.isPresentTotalPriceForTrip());
-        assertEquals(payment.getLocationInformation(), "Las Vegas (LAS) to Los Angeles (LAX)");
+        assertTrue(payment.getLocationInformation().contains("Las Vegas (LAS) to"));
     }
 
 }

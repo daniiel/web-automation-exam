@@ -1,6 +1,5 @@
 package com.automation.exam.pages;
 
-import com.automation.exam.pages.base.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -12,14 +11,19 @@ import static com.automation.exam.utils.WaitUtil.waitForPresenceOfElementLocated
 
 public class PaymentPage extends BasePage {
 
-    @FindBy(className = "location-info")
+    private static final String cssLocationInformation = ".location-info";
+    private static final String cssWhoIsTravelingTitle = "h2.faceoff-module-title";
+    private static final String idFirstNameInput = "firstname[0]";
+    private static final String idCountryDropdown = "country_code[0]";
+    private static final String idTotalPrice = "totalPriceForTrip";
+
+    @FindBy(css = cssLocationInformation)
     private WebElement locationInformation;
 
-    private By cssWhoIsTravelingTitle = By.cssSelector("h2.faceoff-module-title");
-    private By idFirstNameInput = By.id("firstname[0]");
-    private By idCountryDropdown = By.id("country_code[0]");
-    private By idTotalPrice = By.id("totalPriceForTrip");
-    private By idCompleteBookingButton = By.id("complete-booking");
+    private By byWhoIsTravelingTitle = By.cssSelector(cssWhoIsTravelingTitle);
+    private By byFirstNameInput = By.id(idFirstNameInput);
+    private By byCountryDropdown = By.id(idCountryDropdown);
+    private By byTotalPrice = By.id(idTotalPrice);
 
 
     public PaymentPage(WebDriver driver) {
@@ -28,7 +32,7 @@ public class PaymentPage extends BasePage {
 
     public boolean isLoaded() {
         try {
-            waitForPresenceOfElementLocated(getWait(), cssWhoIsTravelingTitle);
+            waitForPresenceOfElementLocated(getWait(), byWhoIsTravelingTitle);
             return true;
         } catch (TimeoutException e) {
             return false;
@@ -36,21 +40,22 @@ public class PaymentPage extends BasePage {
     }
 
     public boolean isPresentFirstNameInput() {
-        return isElementPresent(getDriver(), idFirstNameInput);
+        return isElementPresent(getDriver(), byFirstNameInput);
     }
 
     public boolean isPresentCountryDropdown() {
-        return isElementPresent(getDriver(), idCountryDropdown);
+        return isElementPresent(getDriver(), byCountryDropdown);
     }
 
     public boolean isPresentTotalPriceForTrip() {
-        if (getDriver().findElements(idTotalPrice).isEmpty()) {
+        if (getDriver().findElements(byTotalPrice).isEmpty()) {
             return false;
         }
-        return getDriver().findElement(idTotalPrice).getText().isEmpty() ? false : true;
+        return getDriver().findElement(byTotalPrice).getText().isEmpty() ? false : true;
     }
 
     public String getLocationInformation() {
         return locationInformation.getText();
     }
+
 }

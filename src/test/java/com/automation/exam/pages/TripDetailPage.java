@@ -1,6 +1,6 @@
 package com.automation.exam.pages;
 
-import com.automation.exam.pages.base.BasePage;
+import com.automation.exam.utils.Util;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -14,10 +14,8 @@ import java.util.Set;
 
 public class TripDetailPage extends BasePage {
 
-    @FindBy(id = "bookButton")
-    private WebElement bookingButton;
-
     private static final String pageTitle = "Trip Detail";
+    private static final String idBookingButton = "bookButton";
     private static final String cssPriceTotal = "#tripSummaryToggleContent-desktopView ~ .totalContainer .packagePriceTotal";
     private static final String cssPriceGuarantee = "#tripSummaryToggleContent-desktopView ~ .totalContainer .priceGuarantee";
     private static final String cssDepartureInformation = "div.flightSummary div.OD0";
@@ -25,33 +23,17 @@ public class TripDetailPage extends BasePage {
 
     private final String priceGuaranteeText = "Price Guarantee";
 
+    @FindBy(id = idBookingButton)
+    private WebElement bookingButton;
+
     Logger logger = LoggerFactory.getLogger(TripDetailPage.class);
 
     public TripDetailPage(WebDriver driver) {
         super(driver);
-        changeToTripDetailTab();
-    }
-
-    public void changeToTripDetailTab() {
-        String currentWindow = getDriver().getWindowHandle();
-        Set<String> windows = getDriver().getWindowHandles();
-        Iterator<String> iWindows = windows.iterator();
-        String childWindow;
-
-        while(iWindows.hasNext()) {
-            childWindow = iWindows.next();
-
-            if (!currentWindow.equalsIgnoreCase(childWindow)) {
-                getDriver().switchTo().window(childWindow);
-                if (getPageTitle().contains(pageTitle)) {
-                    return;
-                }
-            }
-        }
     }
 
     public String getPageTitle() {
-        logger.info("title page: " + getDriver().getTitle());
+        changeToTripDetailTab();
         return getDriver().getTitle();
     }
 
@@ -72,11 +54,15 @@ public class TripDetailPage extends BasePage {
     }
 
     public boolean isPresentPriceGuaranteeText() {
+        if(Util.isElementPresent(getDriver(), By.cssSelector(cssPriceGuarantee))) {
+            String priceText = getDriver().findElement(By.cssSelector(cssPriceGuarantee)).getText();
+            logger.info("price Text: " + priceText);
+        }
         if (getDriver().findElements(By.cssSelector(cssPriceGuarantee)).isEmpty()) {
+            logger.info("Price guarantee !! empty");
             return false;
         }
         String priceText = getDriver().findElement(By.cssSelector(cssPriceGuarantee)).getText();
-        logger.info("price Text: " + priceText);
 
         return priceText.equals(priceGuaranteeText);
     }
@@ -84,6 +70,24 @@ public class TripDetailPage extends BasePage {
     public PaymentPage clickBookingButton() {
         bookingButton.click();
         return new PaymentPage(getDriver());
+    }
+
+    public void changeToTripDetailTab() {
+        String currentWindow = getDriver().getWindowHandle();
+        Set<String> windows = getDriver().getWindowHandles();
+        Iterator<String> iWindows = windows.iterator();
+        String childWindow;
+
+        while(iWindows.hasNext()) {
+            childWindow = iWindows.next();
+
+            if (!currentWindow.equalsIgnoreCase(childWindow)) {
+                getDriver().switchTo().window(childWindow);
+                if (getPageTitle().contains(pageTitle)) {
+                    return;
+                }
+            }
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-package com.automation.exam.pages.base;
+package com.automation.exam.pages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
@@ -13,12 +13,6 @@ public abstract class BasePage {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, 20);
         PageFactory.initElements(driver, this);
-    }
-
-    public void dispose() {
-        if (driver != null) {
-            driver.quit();
-        }
     }
 
     public WebDriver getDriver() {

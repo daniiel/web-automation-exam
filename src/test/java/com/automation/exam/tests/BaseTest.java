@@ -20,7 +20,7 @@ public class BaseTest {
 
     @AfterTest(alwaysRun = true)
     public void closeBrowser() {
-//        driver.quit();
+        driver.quit();
     }
 
     public WebDriver getDriver() {

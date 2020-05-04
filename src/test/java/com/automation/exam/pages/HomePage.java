@@ -1,6 +1,5 @@
 package com.automation.exam.pages;
 
-import com.automation.exam.pages.base.BasePage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -8,16 +7,18 @@ import org.openqa.selenium.support.FindBy;
 
 public class HomePage extends BasePage {
 
-    @FindBy(id = "tab-flight-tab-hp")
+    private static final String idFlightTab = "tab-flight-tab-hp";
+    private static final String idHotelTab = "tab-hotel-tab-hp";
+    private static final String idVacationPackagesTab = "tab-package-tab-hp";
+
+    private static final String URL = "https://www.travelocity.com/";
+
+    @FindBy(id = idFlightTab)
     private WebElement flightTab;
-
-    @FindBy(id = "tab-hotel-tab-hp")
+    @FindBy(id = idHotelTab)
     private WebElement hotelTab;
-
-    @FindBy(id = "tab-package-tab-hp")
+    @FindBy(id = idVacationPackagesTab)
     private WebElement vacationPackagesTab;
-
-    private static String URL = "https://www.travelocity.com/";
 
     public HomePage(WebDriver driver) {
         super(driver);

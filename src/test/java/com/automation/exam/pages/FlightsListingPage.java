@@ -1,13 +1,11 @@
 package com.automation.exam.pages;
 
-import com.automation.exam.pages.base.BasePage;
 import com.google.common.collect.Ordering;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,21 +15,33 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.automation.exam.utils.Util.*;
+import static com.automation.exam.utils.Util.dropdownHasAllOptions;
+import static com.automation.exam.utils.Util.selectDropdownOptionByValue;
 import static com.automation.exam.utils.WaitUtil.*;
 
 public class FlightsListingPage extends BasePage {
 
-    @FindBy(id = "sortDropdown")
+    // Offer elements
+    private static final String idSortDropdown = "sortDropdown";
+    private static final String idFlightDetail = "flight-details-tabs-offer";
+    private static final String cssSortByOptions = "sortDropdown option";
+    private static final String cssFlightOfferList = "#flightModuleList li[data-test-id='offer-listing']";
+    private static final String cssFlightDurationList = "span.duration-emphasis";
+    private static final String cssDetailsAndBaggageFees = "a[data-test-id='flight-details-link']";
+    private static final String cssFlightDetailsContainer = ".details-container + .flight-details";
+
+    private static final String cssBaggageFeeDetails = ".details-baggage-fee-info";
+
+    @FindBy(id = idSortDropdown)
     private WebElement sortByDropdown;
 
-    @FindBy(css = "sortDropdown option")
+    @FindBy(css = cssSortByOptions)
     private List<WebElement> sortByOptions;
 
-    @FindBy(css = "#flightModuleList li[data-test-id='offer-listing']")
+    @FindBy(css = cssFlightOfferList)
     private List<WebElement> flightOfferList;
 
-    @FindBy(css = "span.duration-emphasis")
+    @FindBy(css = cssFlightDurationList)
     List<WebElement> flightDurationList;
 
     private By idTitlePage = By.id("titleBar");
@@ -39,13 +49,6 @@ public class FlightsListingPage extends BasePage {
     private By cssSelectFareButton = By.cssSelector(".basic-economy-footer button[data-test-id='select-button']");
     private By cssFlightDuration = By.cssSelector("span.duration-emphasis");
 
-    // Offer elements
-    private static final String idSortDropdown = "sortDropdown";
-    private static final String cssFlightOfferList = "#flightModuleList li[data-test-id='offer-listing']";
-    private static final String cssDetailsAndBaggageFees = "a[data-test-id='flight-details-link']";
-    private static final String cssFlightDetailsContainer = ".details-container + .flight-details";
-    private static final String idFlightDetail = "flight-details-tabs-offer";
-    private static final String cssBaggageFeeDetails = ".details-baggage-fee-info";
 
     private static final List<String> sortByOptionsText =
             Arrays.asList("Price (Lowest)", "Price (Highest)", "Duration (Shortest)", "Duration (Longest)",
@@ -70,8 +73,11 @@ public class FlightsListingPage extends BasePage {
     }
 
     public boolean isPresentOrderByOption() {
-        List<WebElement> sortBySelect = getDriver().findElements(By.id(idSortDropdown));
-        return !sortBySelect.isEmpty();
+        return !getDriver().findElements(By.id(idSortDropdown)).isEmpty();
+    }
+
+    public boolean sortByDropdownHasAllOptions() {
+        return dropdownHasAllOptions(sortByDropdown, sortByOptionsText);
     }
 
     public boolean isPresentSelectBtnForAllOffers() {
@@ -86,7 +92,7 @@ public class FlightsListingPage extends BasePage {
     public void clickDetailsAndBaggageFeesToggle(WebElement offer) {
         WebElement toggle = offer.findElement(By.cssSelector(cssDetailsAndBaggageFees));
         toggle.click();
-        getWait().until(ExpectedConditions.attributeContains(toggle, "class", "open"));
+        waitForAttributeContains(getWait(), toggle, "class", "open");
     }
 
     public boolean isFlightDetailsPresent(WebElement offer) {
@@ -138,7 +144,7 @@ public class FlightsListingPage extends BasePage {
         }
     }
 
-    public void pickDepartureLASOffer() {
+    public void pickFirstDepartureLASOffer() {
         if (!flightOfferList.isEmpty()) {
             // Select First result (Departure to Los Angeles)
             logger.info("Offer (LAS): " + flightOfferList.get(0).getAttribute("id"));
@@ -146,7 +152,7 @@ public class FlightsListingPage extends BasePage {
         }
     }
 
-    public TripDetailPage pickDepartureLAXOffer() {
+    public TripDetailPage pickThirdDepartureLAXOffer() {
         // Departure to Las Vegas
         waitForNumberOfElementsToBeMoreThan(getWait(), By.cssSelector(cssFlightOfferList), 0);
 
