@@ -21,14 +21,15 @@ import static com.automation.exam.utils.WaitUtil.*;
 
 public class FlightsListingPage extends BasePage {
 
-    // Offer elements
     private static final String idSortDropdown = "sortDropdown";
     private static final String idFlightDetail = "flight-details-tabs-offer";
+    private static final String idTitlePage = "titleBar";
     private static final String cssSortByOptions = "sortDropdown option";
     private static final String cssFlightOfferList = "#flightModuleList li[data-test-id='offer-listing']";
-    private static final String cssFlightDurationList = "span.duration-emphasis";
+    private static final String cssSelectButton = "[data-test-id='listing-summary'] button[data-test-id='select-button']";
+    private static final String cssSelectFareButton = ".basic-economy-footer button[data-test-id='select-button']";
+    private static final String cssFlightDuration = "span.duration-emphasis";
     private static final String cssDetailsAndBaggageFees = "a[data-test-id='flight-details-link']";
-    private static final String cssFlightDetailsContainer = ".details-container + .flight-details";
 
     private static final String cssBaggageFeeDetails = ".details-baggage-fee-info";
 
@@ -41,13 +42,13 @@ public class FlightsListingPage extends BasePage {
     @FindBy(css = cssFlightOfferList)
     private List<WebElement> flightOfferList;
 
-    @FindBy(css = cssFlightDurationList)
+    @FindBy(css = cssFlightDuration)
     List<WebElement> flightDurationList;
 
-    private By idTitlePage = By.id("titleBar");
-    private By cssSelectButton = By.cssSelector("[data-test-id='listing-summary'] button[data-test-id='select-button']");
-    private By cssSelectFareButton = By.cssSelector(".basic-economy-footer button[data-test-id='select-button']");
-    private By cssFlightDuration = By.cssSelector("span.duration-emphasis");
+    private By byTitlePage = By.id(idTitlePage);
+    private By bySelectButton = By.cssSelector(cssSelectButton);
+    private By bySelectFareButton = By.cssSelector(cssSelectFareButton);
+    private By byFlightDuration = By.cssSelector(cssFlightDuration);
 
 
     private static final List<String> sortByOptionsText =
@@ -65,7 +66,7 @@ public class FlightsListingPage extends BasePage {
 
     public boolean isLoaded() {
         try {
-            waitForPresenceOfElementLocated(getWait(), idTitlePage);
+            waitForPresenceOfElementLocated(getWait(), byTitlePage);
             return true;
         } catch (TimeoutException e) {
             return false;
@@ -82,11 +83,24 @@ public class FlightsListingPage extends BasePage {
 
     public boolean isPresentSelectBtnForAllOffers() {
         waitForNumberOfElementsToBeMoreThan(getWait(), By.cssSelector(cssFlightOfferList), 0);
-        return isPresentElementForAllOffers(cssSelectButton);
+        return isPresentElementForAllOffers(bySelectButton);
     }
 
     public boolean isPresentFlightDurationForAllOffers() {
-        return isPresentElementForAllOffers(cssFlightDuration);
+        return isPresentElementForAllOffers(byFlightDuration);
+    }
+
+    public boolean isPresentFlightDetailsAndBaggageFeesForAllOffers() {
+        for (WebElement offer: flightOfferList) {
+            clickDetailsAndBaggageFeesToggle(offer);
+            logger.info("offerId: " + offer.getAttribute("id"));
+
+            if (!isFlightDetailsPresent(offer) || !isBaggageFeeDetailsPresent(offer)) {
+                logger.info("offerId: " + offer.getAttribute("id") + " doesn't have flight or baggage fee details");
+                return false;
+            }
+        }
+        return true;
     }
 
     public void clickDetailsAndBaggageFeesToggle(WebElement offer) {
@@ -101,19 +115,6 @@ public class FlightsListingPage extends BasePage {
 
     public boolean isBaggageFeeDetailsPresent(WebElement offer) {
         return !offer.findElements(By.cssSelector(cssBaggageFeeDetails)).isEmpty();
-    }
-
-    public boolean isPresentFlightDetailsAndBaggageFeesForAllOffers() {
-        for (WebElement offer: flightOfferList) {
-            clickDetailsAndBaggageFeesToggle(offer);
-            logger.info("offerId: " + offer.getAttribute("id"));
-
-            if (!isFlightDetailsPresent(offer) || !isBaggageFeeDetailsPresent(offer)) {
-                logger.info("offerId: " + offer.getAttribute("id") + " doesn't have flight or baggage fee details");
-                return false;
-            }
-        }
-        return true;
     }
 
     public boolean isPresentElementForAllOffers(By by) {
@@ -157,8 +158,6 @@ public class FlightsListingPage extends BasePage {
         waitForNumberOfElementsToBeMoreThan(getWait(), By.cssSelector(cssFlightOfferList), 0);
 
         int numberOffers = flightOfferList.size();
-
-        // Select Third result (Departure to Las Vegas)
         int indexOffer = numberOffers > 2 ? 2 : numberOffers -1;
         logger.info("Offer (LAX): " + flightOfferList.get(indexOffer).getAttribute("id"));
         confirmOffer(flightOfferList.get(indexOffer));
@@ -167,10 +166,10 @@ public class FlightsListingPage extends BasePage {
     }
 
     private void confirmOffer(WebElement offer) {
-        boolean hasOfferDoubleConfirmation = !offer.findElements(cssSelectFareButton).isEmpty();
-        offer.findElement(cssSelectButton).click();
+        boolean hasOfferDoubleConfirmation = !offer.findElements(bySelectFareButton).isEmpty();
+        offer.findElement(bySelectButton).click();
         if (hasOfferDoubleConfirmation) {
-            offer.findElement(cssSelectFareButton).click();
+            offer.findElement(bySelectFareButton).click();
         }
     }
 

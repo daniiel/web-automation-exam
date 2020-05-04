@@ -49,15 +49,16 @@ public class Util {
         WebElement calendarButton = datePicker.findElement(By.cssSelector("span.icon-calendar"));
         calendarButton.click(); // datePicker-dropdown pane shown
 
-        WebElement datePickerCalendar = datePicker.findElement(By.className("datepicker-cal"));
-        waitForVisibilityOf(wait, datePickerCalendar);
+        WebElement datePickerDropdown = datePicker.findElement(By.className("datepicker-cal"));
+        waitForVisibilityOf(wait, datePickerDropdown);
 
-        changeMonthPanel(wait, datePicker, desiredDate);
+        changeMonthPanel(wait, datePickerDropdown, desiredDate);
         pickDay(datePicker, desiredDate);
     }
 
-    private static void changeMonthPanel(WebDriverWait wait, WebElement datePicker, LocalDate desiredDate) {
+    private static void changeMonthPanel(WebDriverWait wait, WebElement datePickerDropdown, LocalDate desiredDate) {
         LocalDate currentDate = LocalDate.now();
+
         if (desiredDate.isBefore(currentDate)) {
             throw new RuntimeException("Date not allowed");
         }
@@ -65,13 +66,17 @@ public class Util {
         int monthsToChange = desiredDate.getMonthValue() - currentDate.getMonthValue();
 
         if (monthsToChange > 0) {
-            WebElement nextMonthBtn = datePicker.findElement(By.cssSelector("button.datepicker-next"));
-            for (int i = 0; i< monthsToChange; i++) {
-                nextMonthBtn.click();
-                nextMonthBtn = datePicker.findElement(By.cssSelector("button.datepicker-next"));
-                waitForVisibilityOf(wait, nextMonthBtn);
+            WebElement nextMonthButton = getNextButton(datePickerDropdown);
+            for (int i = 0; i < monthsToChange; i++) {
+                nextMonthButton.click();
+                // solve StaleElementReferenceException
+                nextMonthButton = getNextButton(datePickerDropdown);
+                waitForVisibilityOf(wait, nextMonthButton);
             }
         }
+    }
+    private static WebElement getNextButton(WebElement datePickerDropdown) {
+        return datePickerDropdown.findElement(By.cssSelector("button.datepicker-next"));
     }
 
     private static void pickDay(WebElement datePicker, LocalDate dateDesired) {
