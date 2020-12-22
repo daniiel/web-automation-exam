@@ -3,7 +3,6 @@
     <test name="booking flight">
 
         <parameter name="browser" value="CHROME"/>
-
         <parameter name="flightType" value="Roundtrip"/>
         <parameter name="flyingFrom" value="LAS"/>
         <parameter name="flyingTo" value="LAX"/>

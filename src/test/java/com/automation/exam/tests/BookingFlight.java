@@ -20,42 +20,31 @@ public class BookingFlight extends BaseTest {
     private PaymentPage payment;
 
     @BeforeTest()
-    public void selectFlightTab() {
+    @Parameters({"flightType", "flyingFrom", "flyingTo", "numberOfAdults"})
+    public void selectFlightTab(String flightType, String flyingFrom, String flyingTo, String numberOfAdults) {
         HomePage homePage = new HomePage(getDriver());
         homePage.clickFlightTab();
+        searchForFlights(flightType, flyingFrom, flyingTo, numberOfAdults);
+//        assertTrue(flightsListing.isLoaded(), "The flights listing page is not loaded");
     }
 
     @Test
-    @Parameters({"flightType", "flyingFrom", "flyingTo", "numberOfAdults"})
-    public void searchForFlights(String flightType, String flyingFrom, String flyingTo, String numberOfAdults) {
-        FlightFormPage flightForm = new FlightFormPage(getDriver());
-        LocalDate departingDate = LocalDate.now().plusMonths(2);
-        LocalDate returningDate = LocalDate.now().plusMonths(2).plusDays(5);
-
-        flightForm.selectFlightType(flightType);
-        flightForm.fillFlightForm(flyingFrom, flyingTo, departingDate, returningDate, numberOfAdults);
-        this.flightsListing = flightForm.clickSearchButton();
-
-        assertTrue(flightsListing.isLoaded(), "The flights listing page is not loaded");
-    }
-
-    @Test(dependsOnMethods = "searchForFlights")
     public void validateFlightModuleListComponents() {
         assertTrue(flightsListing.isPresentOrderByOption());
-        assertTrue(flightsListing.sortByDropdownHasAllOptions());
+        assertTrue(flightsListing.sortDropdownHasAllOptions());
         assertTrue(flightsListing.isPresentSelectBtnForAllOffers());
         assertTrue(flightsListing.isPresentFlightDurationForAllOffers());
         assertTrue(flightsListing.isPresentFlightDetailsAndBaggageFeesForAllOffers());
     }
 
-    @Test(dependsOnMethods = "validateFlightModuleListComponents")
+    @Test
     @Parameters({"sortByDuration"})
     public void sortListByDuration(String sortByDuration) {
         flightsListing.sortOffersByValue(sortByDuration);
         assertTrue(flightsListing.isFlightDurationTimeOrderByShortest(sortByDuration));
     }
 
-    @Test(dependsOnMethods = "sortListByDuration")
+    @Test
     public void pickOffers() {
         flightsListing.pickFirstDepartureLASOffer();
         tripSummary = flightsListing.pickThirdDepartureLAXOffer();
@@ -69,7 +58,7 @@ public class BookingFlight extends BaseTest {
         assertTrue(tripSummary.isPresentPriceGuaranteeText(), "Price guarantee text is not present");
     }
 
-    @Test(dependsOnMethods = "validateTripDetailsComponents")
+    @Test(dependsOnMethods = "pickOffers")
     public void paymentValidation() {
         payment = tripSummary.clickBookingButton();
         assertTrue(payment.isLoaded(),"The Payment page is not loaded");
@@ -77,6 +66,15 @@ public class BookingFlight extends BaseTest {
         assertTrue(payment.isPresentCountryDropdown());
         assertTrue(payment.isPresentTotalPriceForTrip());
         assertTrue(payment.getLocationInformation().contains("Las Vegas (LAS) to"));
+    }
+
+    private void searchForFlights(String flightType, String flyingFrom, String flyingTo, String numberOfAdults) {
+        FlightFormPage flightForm = new FlightFormPage(getDriver());
+        LocalDate departingDate = LocalDate.now().plusMonths(2);
+        LocalDate returningDate = LocalDate.now().plusMonths(2).plusDays(5);
+        flightForm.selectFlightType(flightType);
+        flightForm.fillFlightForm(flyingFrom, flyingTo, departingDate, returningDate, numberOfAdults);
+        this.flightsListing = flightForm.clickSearchButton();
     }
 
 }
